@@ -1,0 +1,62 @@
+// Merge this into the `theme.extend` section of your existing tailwind.config.js
+// These are the exact tokens used across every FocusFlow screen — keep them
+// in one place so every component stays visually consistent.
+
+module.exports = {
+  colors: {
+    primary: "#4a654e",
+    "primary-container": "#8ba88e",
+    "primary-fixed": "#cceace",
+    "on-primary": "#ffffff",
+    "on-primary-container": "#233d29",
+    secondary: "#4b6173",
+    "secondary-container": "#cbe2f8",
+    "secondary-fixed": "#cee5fb",
+    "on-secondary": "#ffffff",
+    "on-secondary-container": "#4f6578",
+    tertiary: "#615e57",
+    "tertiary-fixed": "#e8e2d9",
+    "on-tertiary-fixed-variant": "#494640",
+    background: "#f7fafd",
+    surface: "#f7fafd",
+    "surface-variant": "#e0e3e6",
+    "surface-container": "#ebeef2",
+    "surface-container-low": "#f1f4f7",
+    "surface-container-high": "#e5e8ec",
+    "surface-container-lowest": "#ffffff",
+    "surface-dim": "#d7dade",
+    "on-surface": "#181c1f",
+    "on-surface-variant": "#424842",
+    outline: "#737972",
+    "outline-variant": "#c2c8c0",
+    error: "#ba1a1a",
+    "error-container": "#ffdad6",
+    "on-error": "#ffffff",
+    "on-error-container": "#93000a",
+  },
+  borderRadius: {
+    DEFAULT: "0.25rem",
+    lg: "0.5rem",
+    xl: "0.75rem",
+    full: "9999px",
+  },
+  spacing: {
+    gutter: "16px",
+    unit: "8px",
+    "tap-target-min": "48px",
+    "stack-gap": "20px",
+    "container-margin": "24px",
+  },
+  fontFamily: {
+    sans: ["Quicksand", "sans-serif"],
+  },
+  fontSize: {
+    "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+    "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+    "label-sm": ["12px", { lineHeight: "16px", fontWeight: "500" }],
+    "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+    "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+    "headline-lg-mobile": ["26px", { lineHeight: "32px", fontWeight: "700" }],
+    "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+  },
+};
