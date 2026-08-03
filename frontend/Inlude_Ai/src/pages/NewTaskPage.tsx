@@ -85,6 +85,10 @@ export default function NewTaskPage() {
               <span className="material-symbols-outlined text-[16px]">info</span>
               Our AI will split this into manageable mini-steps.
             </p>
+            <p className="text-label-sm text-outline flex items-center gap-1">
+              <span className="material-symbols-outlined text-[16px]">tips_and_updates</span>
+              The more detail you give, the better the breakdown — e.g. "5-paragraph essay on..." works better than "English homework."
+            </p>
           </div>
         </div>
       </main>

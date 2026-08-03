@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from reward.models import PointTransaction
 from .serializers import SubtaskSerializer, TaskSerializer
-from .services import generate_subtasks
+from .services import generate_subtasks, redistribute_points
 from django.db import transaction
 from .models import Subtask, Task
 
@@ -95,3 +95,54 @@ class TaskDetailView(RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)
+    
+from django.db.models import F
+
+class SubtaskExpandView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def post(self, request, pk):
+        subtask = get_object_or_404(Subtask, pk=pk, user=request.user)
+
+        if subtask.completed:
+            return Response(
+                {"detail": "Can't break down a step that's already done."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not subtask.expandable:
+            return Response(
+                {"detail": "This step has already been split and can't be split again."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # smaller range than a full task breakdown (3–7), since we're splitting
+        # one already-small piece, not a whole task
+        new_items = generate_subtasks(subtask.description, min_items=2, max_items=4)
+        new_items = redistribute_points(new_items, subtask.points)
+
+        task = subtask.task
+        original_order = subtask.order
+
+        with transaction.atomic():
+            Subtask.objects.filter(task=task, order__gt=original_order).update(
+                order=F('order') + (len(new_items) - 1)
+            )
+            subtask.delete()
+
+            new_subtasks = [
+                Subtask(
+                    task=task,
+                    user=request.user,
+                    description=item['description'],
+                    points=item['points'],
+                    order=original_order + i,
+                    expandable=False,
+                )
+                for i, item in enumerate(new_items)
+            ]
+            Subtask.objects.bulk_create(new_subtasks)
+
+        task.refresh_from_db()
+        return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)

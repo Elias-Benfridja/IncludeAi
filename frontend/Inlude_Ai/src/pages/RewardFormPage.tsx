@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import BottomNav from "../components/layout/BottomNav";
 import TemplateChip from "../components/rewards/TemplateChip";
-import { createReward, getPointsBalance } from "../api";
+import { createReward, getPointsBalance, recommendRewardPoints } from "../api";
 
 interface Template {
   emoji: string;
@@ -26,6 +26,8 @@ export default function RewardFormPage() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [pointsBalance, setPointsBalance] = useState(0);
+  const [recommending, setRecommending] = useState(false);
+  const [recommendError, setRecommendError] = useState("");
 
   useEffect(() => {
     getPointsBalance().then(setPointsBalance).catch(() => {});
@@ -35,6 +37,24 @@ export default function RewardFormPage() {
     setSelectedTemplate(template.name);
     setName(template.name);
     setPrice(template.price);
+  }
+
+  async function handleRecommend() {
+    if (!name.trim()) {
+      setRecommendError("Give it a name first, then get a suggestion.");
+      return;
+    }
+    setRecommendError("");
+    setRecommending(true);
+    try {
+      const suggested = await recommendRewardPoints(name.trim());
+      setPrice(suggested);
+      setSelectedTemplate(null);
+    } catch {
+      setRecommendError("Couldn't get a suggestion right now — try again.");
+    } finally {
+      setRecommending(false);
+    }
   }
 
   async function handleSave() {
@@ -112,7 +132,20 @@ export default function RewardFormPage() {
               />
               <span className="absolute right-4 text-label-lg text-on-surface-variant">PTS</span>
             </div>
-            {/* Once the AI cost-suggestion endpoint exists, show its recommendation here. */}
+            <button
+              type="button"
+              onClick={handleRecommend}
+              disabled={recommending}
+              className="self-start h-9 px-3 flex items-center gap-1.5 rounded-full border border-tertiary-fixed text-secondary hover:bg-secondary-fixed transition-colors disabled:opacity-50"
+            >
+              <span className={`material-symbols-outlined text-[18px] ${recommending ? "animate-spin" : ""}`}>
+                {recommending ? "progress_activity" : "auto_awesome"}
+              </span>
+              <span className="text-label-sm">
+                {recommending ? "Thinking..." : "Get AI suggestion"}
+              </span>
+            </button>
+            {recommendError && <p className="text-label-sm text-error">{recommendError}</p>}
           </div>
 
           <div className="flex flex-col gap-3 mt-2">

@@ -7,6 +7,7 @@ interface RawSubtask {
   description: string;
   points: number;
   completed: boolean;
+  expandable: boolean;
 }
 
 interface RawTask {
@@ -22,7 +23,13 @@ interface RawReward {
 }
 
 function mapSubtask(s: RawSubtask): Subtask {
-  return { id: s.id, description: s.description, points: s.points, completed: s.completed };
+  return {
+    id: s.id,
+    description: s.description,
+    points: s.points,
+    completed: s.completed,
+    expandable: s.expandable,
+  };
 }
 
 function mapTask(t: RawTask): Task {
@@ -67,6 +74,11 @@ export async function completeSubtask(id: number): Promise<CompleteSubtaskRespon
   return data;
 }
 
+export async function expandSubtask(id: number): Promise<Task> {
+  const { data } = await apiClient.post<RawTask>(`/subtasks/${id}/expand/`);
+  return mapTask(data);
+}
+
 // --- Rewards ---
 export async function getRewards(): Promise<Reward[]> {
   const { data } = await apiClient.get<RawReward[]>("/rewards/");
@@ -80,6 +92,11 @@ export async function createReward(reward: { name: string; price: number }): Pro
 
 export async function deleteReward(id: number): Promise<void> {
   await apiClient.delete(`/rewards/${id}/`);
+}
+
+export async function recommendRewardPoints(name: string): Promise<number> {
+  const { data } = await apiClient.post<{ points: number }>("/rewards/recommend-points/", { name });
+  return data.points;
 }
 
 interface RedeemResponse {

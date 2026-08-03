@@ -4,8 +4,8 @@ from .models import Subtask, Task
 class SubtaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subtask
-        fields = ['id', 'task', 'user', 'description', 'points', 'order', 'completed', 'date']
-        read_only_fields = ['id', 'user', 'points', 'task', 'date']
+        fields = ['id', 'task', 'user', 'description', 'points', 'order', 'completed', 'expandable', 'date']
+        read_only_fields = ['id', 'user', 'points', 'task', 'expandable' ,'date']
         
 class TaskSerializer(serializers.ModelSerializer):
     subtask_set = SubtaskSerializer(many = True, read_only = True)

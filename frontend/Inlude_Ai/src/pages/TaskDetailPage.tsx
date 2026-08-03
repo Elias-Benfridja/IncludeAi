@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import BottomNav from "../components/layout/BottomNav";
 import SubtaskItem from "../components/tasks/SubtaskItem";
-import { getTask, getPointsBalance, completeSubtask, deleteTask } from "../api";
+import { getTask, getPointsBalance, completeSubtask, deleteTask, expandSubtask } from "../api";
 import type { Task } from "../types";
 
 export default function TaskDetailPage() {
@@ -15,6 +15,7 @@ export default function TaskDetailPage() {
   const [error, setError] = useState("");
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [expandingId, setExpandingId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -54,6 +55,18 @@ export default function TaskDetailPage() {
       setPointsBalance(points_balance);
     } catch {
       setError("Couldn't mark that step complete — try again.");
+    }
+  }
+
+  async function handleExpandSubtask(subtaskId: number) {
+    setExpandingId(subtaskId);
+    try {
+      const updatedTask = await expandSubtask(subtaskId);
+      setTask(updatedTask);
+    } catch {
+      setError("Couldn't break that step down further — try again.");
+    } finally {
+      setExpandingId(null);
     }
   }
 
@@ -131,7 +144,9 @@ export default function TaskDetailPage() {
               key={subtask.id}
               subtask={subtask}
               isCurrent={subtask.id === currentId}
+              isExpanding={expandingId === subtask.id}
               onComplete={handleCompleteSubtask}
+              onExpand={handleExpandSubtask}
             />
           ))}
         </section>

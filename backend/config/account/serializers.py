@@ -1,5 +1,13 @@
-from django.contrib.auth.models import User
+from reward.models import RewardItem
 from rest_framework import serializers
+from django.contrib.auth.models import User
+
+DEFAULT_REWARDS = [
+    {"name": "Quick Break", "price": 15},
+    {"name": "Screen Time", "price": 30},
+    {"name": "Sweet Treat", "price": 50},
+    {"name": "Gaming Session", "price": 60},
+]
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -14,4 +22,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data.get('email', ''),
             password=validated_data['password'],
         )
+        RewardItem.objects.bulk_create([
+            RewardItem(user=user, name=r['name'], price=r['price'])
+            for r in DEFAULT_REWARDS
+        ])
         return user

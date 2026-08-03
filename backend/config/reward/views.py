@@ -1,10 +1,12 @@
-from django.db.models.aggregates import Sum
+from django.db.models.aggregates import Avg, Sum
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from tasks.models import Subtask
+from tasks.services import RewardRecommendationError, recommend_reward_points
 from .serializers import RewardItemSerializer
 from .models import PointTransaction, RewardItem
 
@@ -57,3 +59,26 @@ class PointsBalanceView(GenericAPIView):
             user=request.user
         ).aggregate(total=Sum('amount'))['total'] or 0
         return Response({"balance": balance})
+    
+class RewardPointsRecommendationView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        name = request.data.get('name', '').strip()
+        if not name:
+            return Response({"error": "A reward name is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        avg_points = Subtask.objects.filter(
+            user=request.user, completed=True
+        ).aggregate(avg=Avg('points'))['avg'] or 5.0
+
+        existing_prices = list(
+            RewardItem.objects.filter(user=request.user).values_list('price', flat=True)
+        )
+
+        try:
+            points = recommend_reward_points(name, avg_points, existing_prices)
+        except RewardRecommendationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+
+        return Response({"points": points})

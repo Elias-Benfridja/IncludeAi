@@ -3,6 +3,7 @@ export interface Subtask {
   description: string;
   points: number;
   completed: boolean;
+  expandable: boolean;
 }
 
 export interface Task {

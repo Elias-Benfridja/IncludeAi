@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import BottomNav from "../components/layout/BottomNav";
 import RewardCard from "../components/rewards/RewardCard";
-import { getRewards, getPointsBalance, redeemReward } from "../api";
+import { getRewards, getPointsBalance, redeemReward, deleteReward } from "../api";
 import type { Reward } from "../types";
 
 export default function RewardsPage() {
@@ -43,6 +43,15 @@ export default function RewardsPage() {
     }
   }
 
+  async function handleDelete(rewardId: number) {
+    try {
+      await deleteReward(rewardId);
+      setRewards((prev) => prev.filter((r) => r.id !== rewardId));
+    } catch {
+      setError("Couldn't delete that reward — try again.");
+    }
+  }
+
   return (
     <div className="min-h-screen">
       <TopBar pointsBalance={pointsBalance} />
@@ -78,6 +87,7 @@ export default function RewardsPage() {
                 reward={reward}
                 pointsBalance={pointsBalance}
                 onRedeem={handleRedeem}
+                onDelete={handleDelete}
               />
             ))}
           </div>

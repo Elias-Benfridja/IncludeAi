@@ -15,4 +15,6 @@ class Subtask(models.Model):
     points = models.PositiveIntegerField()
     order = models.PositiveIntegerField()
     completed = models.BooleanField(default=False)
+    expandable = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
+    
