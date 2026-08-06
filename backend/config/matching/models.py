@@ -10,7 +10,8 @@ class ChatSession(models.Model):
     task_a = models.ForeignKey('tasks.Task', on_delete=CASCADE, related_name='chats_as_task_a')
     task_b = models.ForeignKey('tasks.Task', on_delete=CASCADE, related_name='chats_as_task_b')
     last_activity_at = models.DateTimeField(auto_now_add=True)
-    
+    created_at = models.DateTimeField(auto_now_add=True) 
+
     class Meta():
         unique_together = [('user_a', 'user_b')]
     
