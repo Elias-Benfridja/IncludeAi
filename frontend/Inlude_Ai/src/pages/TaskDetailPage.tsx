@@ -131,6 +131,14 @@ export default function TaskDetailPage() {
           </div>
         </section>
 
+        <button
+          onClick={() => navigate(`/tasks/${task.id}/similar`)}
+          className="w-full h-tap-target-min mb-6 px-6 border-2 border-secondary text-secondary text-label-lg rounded-full hover:bg-surface-container-low transition-colors duration-200 flex items-center justify-center gap-2"
+        >
+          <span className="material-symbols-outlined">group</span>
+          Find others working on this
+        </button>
+
         {error && <p className="text-label-sm text-error mb-4">{error}</p>}
 
         <section className="space-y-4">

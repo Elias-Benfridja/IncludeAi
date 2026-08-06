@@ -19,7 +19,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'tasks',
-    'reward'
+    'reward',
+    'matching',
+    'account'
 ]
 
 MIDDLEWARE = [

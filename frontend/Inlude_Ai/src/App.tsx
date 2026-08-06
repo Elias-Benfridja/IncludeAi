@@ -7,6 +7,8 @@ import NewTaskPage from "./pages/NewTaskPage";
 import TaskDetailPage from "./pages/TaskDetailPage";
 import RewardsPage from "./pages/RewardsPage";
 import RewardFormPage from "./pages/RewardFormPage";
+import SimilarTasksPage from "./pages/SimilarTasksPage";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   return (
@@ -52,6 +54,22 @@ export default function App() {
           element={
             <PrivateRoute>
               <RewardFormPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/tasks/:id/similar"
+          element={
+            <PrivateRoute>
+              <SimilarTasksPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chat/:id"
+          element={
+            <PrivateRoute>
+              <ChatPage />
             </PrivateRoute>
           }
         />

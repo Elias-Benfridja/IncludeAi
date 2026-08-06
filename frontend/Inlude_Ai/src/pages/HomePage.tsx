@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import TopBar from "../components/layout/TopBar";
 import BottomNav from "../components/layout/BottomNav";
 import TaskCard from "../components/tasks/TaskCard";
-import { getTasks, getPointsBalance } from "../api";
+import MatchingToggle from "../components/matching/MatchingToggle";
+import { getTasks, getPointsBalance, getMatchingPreference, setMatchingPreference } from "../api";
 import type { Task } from "../types";
 
 export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [pointsBalance, setPointsBalance] = useState(0);
+  const [matchingEnabled, setMatchingEnabledState] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -15,10 +17,15 @@ export default function HomePage() {
     let cancelled = false;
     async function load() {
       try {
-        const [taskList, balance] = await Promise.all([getTasks(), getPointsBalance()]);
+        const [taskList, balance, matching] = await Promise.all([
+          getTasks(),
+          getPointsBalance(),
+          getMatchingPreference().catch(() => false),
+        ]);
         if (!cancelled) {
           setTasks(taskList);
           setPointsBalance(balance);
+          setMatchingEnabledState(matching);
         }
       } catch {
         if (!cancelled) setError("Couldn't load your tasks — try refreshing.");
@@ -31,6 +38,15 @@ export default function HomePage() {
       cancelled = true;
     };
   }, []);
+
+  async function handleToggleMatching(enabled: boolean) {
+    setMatchingEnabledState(enabled);
+    try {
+      await setMatchingPreference(enabled);
+    } catch {
+      setError("Couldn't update your matching preference — try again.");
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -57,6 +73,10 @@ export default function HomePage() {
             <TaskCard key={task.id} task={task} featured={i === 0} />
           ))}
         </div>
+
+        <section className="mt-8 pt-8 border-t border-tertiary-fixed">
+          <MatchingToggle enabled={matchingEnabled} onToggle={handleToggleMatching} />
+        </section>
       </main>
 
       <BottomNav />

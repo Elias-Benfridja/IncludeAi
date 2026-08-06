@@ -1,7 +1,7 @@
 import apiClient from "./api/client";
-import type { Task, Subtask, Reward } from "./types";
+import type { Task, Subtask, Reward, TaskMatch, ChatSession, ChatMessage } from "./types";
 
-// Raw shapes returned by the DRF serializers, before we reshape them for the UI
+
 interface RawSubtask {
   id: number;
   description: string;
@@ -112,4 +112,49 @@ export async function redeemReward(id: number): Promise<RedeemResponse> {
 export async function getPointsBalance(): Promise<number> {
   const { data } = await apiClient.get<{ balance: number }>("/rewards/points/balance/");
   return data.balance;
+}
+
+// --- Matching ---
+export async function getSimilarTasks(taskId: number): Promise<TaskMatch[]> {
+  const { data } = await apiClient.get<TaskMatch[]>(`/matching/tasks/${taskId}/similar/`);
+  return data;
+}
+
+export async function createChatSession(
+  otherUserId: number,
+  myTaskId: number,
+  otherTaskId: number
+): Promise<ChatSession> {
+  const { data } = await apiClient.post<ChatSession>("/matching/", {
+    other_user_id: otherUserId,
+    my_task_id: myTaskId,
+    other_task_id: otherTaskId,
+  });
+  return data;
+}
+
+export async function getChatMessages(sessionId: number): Promise<ChatMessage[]> {
+  const { data } = await apiClient.get<ChatMessage[]>(`/matching/sessions/${sessionId}/messages/`);
+  return data;
+}
+
+export async function sendChatMessage(sessionId: number, content: string): Promise<ChatMessage> {
+  const { data } = await apiClient.post<ChatMessage>(`/matching/sessions/${sessionId}/messages/`, {
+    content,
+  });
+  return data;
+}
+
+
+export async function getMatchingPreference(): Promise<boolean> {
+  const { data } = await apiClient.get<{ matching_enabled: boolean }>("/users/matching-preference/");
+  return data.matching_enabled;
+}
+
+export async function setMatchingPreference(enabled: boolean): Promise<boolean> {
+  const { data } = await apiClient.patch<{ matching_enabled: boolean }>(
+    "/users/matching-preference/",
+    { matching_enabled: enabled }
+  );
+  return data.matching_enabled;
 }

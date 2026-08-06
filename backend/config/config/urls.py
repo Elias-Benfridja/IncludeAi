@@ -25,4 +25,5 @@ urlpatterns = [
     path('' , include('tasks.urls')),
     path('rewards/', include('reward.urls')),
     path('users/', include('account.urls')),
+    path('matching/', include('matching.urls'))
 ]
