@@ -12,6 +12,9 @@ export interface Task {
   subtasks: Subtask[];
   completedCount?: number;
   totalCount?: number;
+  timer_started_at: string | null;
+  timer_elapsed_seconds: number;
+  timer_stopped: boolean;
 }
 
 export interface Reward {

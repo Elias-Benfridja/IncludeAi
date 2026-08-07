@@ -1,4 +1,5 @@
 from django.db.models.aggregates import Sum
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, GenericAPIView, RetrieveDestroyAPIView
 from rest_framework.response import Response
@@ -6,9 +7,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from reward.models import PointTransaction
 from .serializers import SubtaskSerializer, TaskSerializer
-from .services import generate_subtasks, redistribute_points
+from .services import generate_subtasks, redistribute_points, _bank_elapsed_time
 from django.db import transaction
 from .models import Subtask, Task
+from django.db.models import F
 
 # Create your views here.
 
@@ -46,6 +48,13 @@ class SubtaskCompleteView(GenericAPIView):
 
         subtask.completed = True
         subtask.save()
+        
+        task = subtask.task
+        
+        if not task.subtask_set.filter(completed=False).exists() and not task.timer_stopped:
+            _bank_elapsed_time(task)
+            task.timer_stopped = True
+            task.save(update_fields=['timer_started_at', 'timer_elapsed_seconds', 'timer_stopped'])
 
         PointTransaction.objects.create(
             user=request.user,
@@ -95,8 +104,7 @@ class TaskDetailView(RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user)
-    
-from django.db.models import F
+
 
 class SubtaskExpandView(GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -146,3 +154,55 @@ class SubtaskExpandView(GenericAPIView):
 
         task.refresh_from_db()
         return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
+    
+
+class TimerStartView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk, user=request.user)
+
+        if task.timer_stopped:
+            return Response({"detail": "This task's timer has already been stopped."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if task.timer_started_at is not None:
+            return Response({"detail": "Timer is already running."}, status=status.HTTP_400_BAD_REQUEST)
+
+        task.timer_started_at = timezone.now()
+        task.save(update_fields=['timer_started_at'])
+        return Response(TaskSerializer(task).data)
+
+
+class TimerPauseView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk, user=request.user)
+
+        if task.timer_stopped:
+            return Response({"detail": "This task's timer has already been stopped."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if task.timer_started_at is None:
+            return Response({"detail": "Timer isn't running."}, status=status.HTTP_400_BAD_REQUEST)
+
+        _bank_elapsed_time(task)
+        task.save(update_fields=['timer_started_at', 'timer_elapsed_seconds'])
+        return Response(TaskSerializer(task).data)
+
+
+class TimerStopView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk, user=request.user)
+
+        if task.timer_stopped:
+            return Response({"detail": "This task's timer has already been stopped."}, status=status.HTTP_400_BAD_REQUEST)
+
+        _bank_elapsed_time(task)
+        task.timer_stopped = True
+        task.save(update_fields=['timer_started_at', 'timer_elapsed_seconds', 'timer_stopped'])
+        return Response(TaskSerializer(task).data)

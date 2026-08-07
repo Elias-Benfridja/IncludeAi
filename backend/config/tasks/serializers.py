@@ -11,5 +11,5 @@ class TaskSerializer(serializers.ModelSerializer):
     subtask_set = SubtaskSerializer(many = True, read_only = True)
     class Meta:
         model = Task
-        fields = ['id', 'description', 'subtask_set']
-        read_only_fields = ['id', 'user', 'date']
+        fields = ['id', 'description', 'subtask_set', 'timer_started_at', 'timer_elapsed_seconds', 'timer_stopped']
+        read_only_fields = ['id', 'user', 'datetime', 'timer_started_at', 'timer_elapsed_seconds', 'timer_stopped']

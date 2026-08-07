@@ -1,7 +1,7 @@
 import apiClient from "./api/client";
 import type { Task, Subtask, Reward, TaskMatch, ChatSession, ChatMessage } from "./types";
 
-
+// Raw shapes returned by the DRF serializers, before we reshape them for the UI
 interface RawSubtask {
   id: number;
   description: string;
@@ -14,6 +14,9 @@ interface RawTask {
   id: number;
   description: string;
   subtask_set: RawSubtask[];
+  timer_started_at: string | null;
+  timer_elapsed_seconds: number;
+  timer_stopped: boolean;
 }
 
 interface RawReward {
@@ -40,6 +43,9 @@ function mapTask(t: RawTask): Task {
     subtasks,
     completedCount: subtasks.filter((s) => s.completed).length,
     totalCount: subtasks.length,
+    timer_started_at: t.timer_started_at,
+    timer_elapsed_seconds: t.timer_elapsed_seconds,
+    timer_stopped: t.timer_stopped,
   };
 }
 
@@ -61,6 +67,22 @@ export async function createTask(description: string): Promise<Task> {
 
 export async function deleteTask(id: number | string): Promise<void> {
   await apiClient.delete(`/tasks/${id}/`);
+}
+
+// --- Timer ---
+export async function startTimer(taskId: number): Promise<Task> {
+  const { data } = await apiClient.post<RawTask>(`/tasks/${taskId}/timer/start/`);
+  return mapTask(data);
+}
+
+export async function pauseTimer(taskId: number): Promise<Task> {
+  const { data } = await apiClient.post<RawTask>(`/tasks/${taskId}/timer/pause/`);
+  return mapTask(data);
+}
+
+export async function stopTimer(taskId: number): Promise<Task> {
+  const { data } = await apiClient.post<RawTask>(`/tasks/${taskId}/timer/stop/`);
+  return mapTask(data);
 }
 
 // --- Subtasks ---
@@ -145,7 +167,8 @@ export async function sendChatMessage(sessionId: number, content: string): Promi
   return data;
 }
 
-
+// NOTE: backend endpoint not built yet — model + registration default exist,
+// but the read/update view for this preference still needs to be added.
 export async function getMatchingPreference(): Promise<boolean> {
   const { data } = await apiClient.get<{ matching_enabled: boolean }>("/users/matching-preference/");
   return data.matching_enabled;

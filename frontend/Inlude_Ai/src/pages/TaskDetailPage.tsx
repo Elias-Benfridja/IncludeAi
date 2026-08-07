@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import BottomNav from "../components/layout/BottomNav";
 import SubtaskItem from "../components/tasks/SubtaskItem";
-import { getTask, getPointsBalance, completeSubtask, deleteTask, expandSubtask } from "../api";
+import TaskTimer from "../components/tasks/TaskTimer";
+import { getTask, getPointsBalance, completeSubtask, deleteTask, expandSubtask, startTimer, pauseTimer, stopTimer } from "../api";
 import type { Task } from "../types";
 
 export default function TaskDetailPage() {
@@ -16,6 +17,7 @@ export default function TaskDetailPage() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [expandingId, setExpandingId] = useState<number | null>(null);
+  const [timerBusy, setTimerBusy] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -67,6 +69,19 @@ export default function TaskDetailPage() {
       setError("Couldn't break that step down further — try again.");
     } finally {
       setExpandingId(null);
+    }
+  }
+
+  async function handleTimerAction(action: (id: number) => Promise<Task>) {
+    if (!task) return;
+    setTimerBusy(true);
+    try {
+      const updated = await action(task.id);
+      setTask(updated);
+    } catch {
+      setError("Couldn't update the timer — try again.");
+    } finally {
+      setTimerBusy(false);
     }
   }
 
@@ -130,6 +145,16 @@ export default function TaskDetailPage() {
             />
           </div>
         </section>
+
+        <div className="mb-6">
+          <TaskTimer
+            task={task}
+            busy={timerBusy}
+            onStart={() => handleTimerAction(startTimer)}
+            onPause={() => handleTimerAction(pauseTimer)}
+            onStop={() => handleTimerAction(stopTimer)}
+          />
+        </div>
 
         <button
           onClick={() => navigate(`/tasks/${task.id}/similar`)}

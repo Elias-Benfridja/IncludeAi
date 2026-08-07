@@ -1,3 +1,4 @@
+from django.utils import timezone
 import json
 import os
 from dotenv import load_dotenv
@@ -125,3 +126,12 @@ def recommend_reward_points(name: str, avg_subtask_points: float, existing_price
         raise RewardRecommendationError(f"Couldn't parse a number from: {raw}") from e
 
     return max(1, min(1000, points))
+
+def _bank_elapsed_time(task):
+    """If the timer is currently running, fold the time since it started
+    into the accumulated total, and stop it from running. Safe to call
+    even if the timer isn't running — does nothing in that case."""
+    if task.timer_started_at is not None:
+        elapsed = timezone.now() - task.timer_started_at
+        task.timer_elapsed_seconds += int(elapsed.total_seconds())
+        task.timer_started_at = None
