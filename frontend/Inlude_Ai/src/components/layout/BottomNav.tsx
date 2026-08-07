@@ -10,6 +10,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/", label: "Home", icon: "home" },
   { to: "/tasks/new", label: "New Task", icon: "add_circle" },
   { to: "/rewards", label: "Rewards", icon: "stars" },
+  { to: "/chats", label: "Chats", icon: "forum" },
 ];
 
 export default function BottomNav() {

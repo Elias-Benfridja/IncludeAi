@@ -23,7 +23,7 @@ export default function MessageBubble({ message, isOwn }: MessageBubbleProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-1 max-w-[85%]">
+    <div className="flex flex-col items-start gap-1 max-w-[85%] self-start">
       <div className="bg-surface-container-high rounded-2xl rounded-tl-sm p-4 text-on-surface shadow-sm">
         <p className="text-body-md">{message.content}</p>
       </div>

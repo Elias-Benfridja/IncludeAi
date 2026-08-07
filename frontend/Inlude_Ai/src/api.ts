@@ -1,7 +1,7 @@
 import apiClient from "./api/client";
 import type { Task, Subtask, Reward, TaskMatch, ChatSession, ChatMessage } from "./types";
 
-// Raw shapes returned by the DRF serializers, before we reshape them for the UI
+
 interface RawSubtask {
   id: number;
   description: string;
@@ -167,8 +167,28 @@ export async function sendChatMessage(sessionId: number, content: string): Promi
   return data;
 }
 
-// NOTE: backend endpoint not built yet — model + registration default exist,
-// but the read/update view for this preference still needs to be added.
+export async function getChatSession(sessionId: number): Promise<ChatSession> {
+  const { data } = await apiClient.get<ChatSession>(`/matching/sessions/${sessionId}/`);
+  return data;
+}
+
+// All active (non-expired) chats for the current user — powers the Active Chats page.
+export async function getChatSessions(): Promise<ChatSession[]> {
+  const { data } = await apiClient.get<ChatSession[]>("/matching/sessions/");
+  return data;
+}
+
+
+export async function getChatNotifications(): Promise<ChatSession[]> {
+  const { data } = await apiClient.get<ChatSession[]>("/matching/notifications/");
+  return data;
+}
+
+export async function blockUser(userId: number): Promise<void> {
+  await apiClient.post("/matching/block/", { user_id: userId });
+}
+
+
 export async function getMatchingPreference(): Promise<boolean> {
   const { data } = await apiClient.get<{ matching_enabled: boolean }>("/users/matching-preference/");
   return data.matching_enabled;

@@ -40,7 +40,7 @@ export default function ChatInput({ expired, sending, onSend }: ChatInputProps) 
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Type a message..."
-          className="flex-1 bg-transparent border-none focus:ring-0 text-body-md text-on-surface placeholder:text-on-surface-variant px-2"
+          className="flex-1 bg-transparent border-none outline-none focus:outline-none focus:ring-0 text-body-md text-on-surface placeholder:text-on-surface-variant px-2"
         />
         <button
           type="submit"

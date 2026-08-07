@@ -39,6 +39,8 @@ export interface OtherUser {
 export interface ChatSession {
   id: number;
   other_user: OtherUser;
+  unread_count: number;
+  is_new_request: boolean;
   last_activity_at: string;
   created_at: string;
 }
