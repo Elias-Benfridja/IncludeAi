@@ -65,7 +65,18 @@ export default function TaskTimer({ task, onStart, onPause, onStop, busy }: Task
         </div>
       </div>
 
-      {!task.timer_stopped && (
+      {task.timer_stopped ? (
+        <div className="flex gap-2">
+          <button
+            onClick={onStart}
+            disabled={busy}
+            className="h-tap-target-min px-5 bg-secondary text-on-secondary text-label-lg rounded-full transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[20px]">replay</span>
+            Restart
+          </button>
+        </div>
+      ) : (
         <div className="flex gap-2">
           {isRunning ? (
             <button

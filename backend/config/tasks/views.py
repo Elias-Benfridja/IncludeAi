@@ -163,14 +163,18 @@ class TimerStartView(GenericAPIView):
     def post(self, request, pk):
         task = get_object_or_404(Task, pk=pk, user=request.user)
 
-        if task.timer_stopped:
-            return Response({"detail": "This task's timer has already been stopped."}, status=status.HTTP_400_BAD_REQUEST)
-
         if task.timer_started_at is not None:
             return Response({"detail": "Timer is already running."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Starting a stopped timer is treated as a restart: it resets the
+        # banked time to zero and clears the stopped flag, rather than
+        # permanently locking the timer after its first stop.
+        if task.timer_stopped:
+            task.timer_stopped = False
+            task.timer_elapsed_seconds = 0
+
         task.timer_started_at = timezone.now()
-        task.save(update_fields=['timer_started_at'])
+        task.save(update_fields=['timer_started_at', 'timer_elapsed_seconds', 'timer_stopped'])
         return Response(TaskSerializer(task).data)
 
 
