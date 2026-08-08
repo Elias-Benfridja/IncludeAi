@@ -40,10 +40,14 @@ export default function BottomNav() {
           {({ isActive }: { isActive: boolean }) => (
             <>
               <span
-                className={`material-symbols-outlined leading-none text-[20px] md:text-[24px] inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                className={`material-symbols-outlined leading-none text-[20px] md:text-[24px] inline-flex items-center justify-center text-center w-9 h-9 rounded-full transition-colors ${
                   isActive ? "bg-secondary-container" : ""
                 }`}
-                style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                style={{
+                  fontVariationSettings: `'FILL' ${
+                    isActive ? 1 : 0
+                  }, 'wght' 400, 'GRAD' 0, 'opsz' 24`,
+                }}
               >
                 {icon}
               </span>
@@ -59,7 +63,12 @@ export default function BottomNav() {
         onClick={handleLogout}
         className="flex flex-col items-center justify-center gap-0.5 px-1 py-1 min-w-0 transition-transform active:scale-95 duration-200 text-on-surface-variant"
       >
-        <span className="material-symbols-outlined leading-none text-[20px] md:text-[24px] inline-flex items-center justify-center w-9 h-9 rounded-full">
+        <span
+          className="material-symbols-outlined leading-none text-[20px] md:text-[24px] inline-flex items-center justify-center text-center w-9 h-9 rounded-full"
+          style={{
+            fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+          }}
+        >
           logout
         </span>
         <span className="text-[10px] md:text-label-lg leading-tight w-full text-center truncate px-0.5">
