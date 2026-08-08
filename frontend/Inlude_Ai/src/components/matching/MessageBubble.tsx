@@ -13,7 +13,7 @@ export default function MessageBubble({ message, isOwn }: MessageBubbleProps) {
 
   if (isOwn) {
     return (
-      <div className="flex flex-col items-end gap-1 max-w-[85%] self-end">
+      <div className="flex flex-col items-end gap-1 max-w-[85%] w-fit self-end ml-auto">
         <div className="bg-secondary-container rounded-2xl rounded-tr-sm p-4 text-on-secondary-container shadow-sm border border-secondary-fixed">
           <p className="text-body-md">{message.content}</p>
         </div>
@@ -23,7 +23,7 @@ export default function MessageBubble({ message, isOwn }: MessageBubbleProps) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-1 max-w-[85%] self-start">
+    <div className="flex flex-col items-start gap-1 max-w-[85%] w-fit self-start mr-auto">
       <div className="bg-surface-container-high rounded-2xl rounded-tl-sm p-4 text-on-surface shadow-sm">
         <p className="text-body-md">{message.content}</p>
       </div>

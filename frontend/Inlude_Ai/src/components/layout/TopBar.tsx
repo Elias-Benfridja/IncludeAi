@@ -5,10 +5,7 @@ interface TopBarProps {
   showBack?: boolean;
 }
 
-/**
- * Shared header across every screen.
- * Pass `showBack` on detail screens; omit it on top-level screens (Home, Rewards, New Task).
- */
+
 export default function TopBar({ pointsBalance, showBack = false }: TopBarProps) {
   const navigate = useNavigate();
 
@@ -32,7 +29,7 @@ export default function TopBar({ pointsBalance, showBack = false }: TopBarProps)
           </span>
         )}
         <h1 className="font-semibold text-headline-md text-primary tracking-tight">
-          FocusFlow
+          Simplify
         </h1>
       </div>
 
