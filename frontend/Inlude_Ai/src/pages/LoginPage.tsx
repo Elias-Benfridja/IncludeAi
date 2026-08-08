@@ -35,7 +35,7 @@ export default function LoginPage() {
             >
               spa
             </span>
-            <h1 className="text-headline-lg text-on-surface mb-2 tracking-tight">FocusFlow</h1>
+            <h1 className="text-headline-lg text-on-surface mb-2 tracking-tight">Simplify</h1>
             <p className="text-body-md text-on-surface-variant">Your space for calm productivity.</p>
           </div>
 
@@ -94,7 +94,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-8 text-body-md text-on-surface-variant text-center">
-            New to FocusFlow?{" "}
+            New to Simplify?{" "}
             <Link to="/register" className="text-secondary font-semibold hover:underline underline-offset-4">
               Create an account
             </Link>
