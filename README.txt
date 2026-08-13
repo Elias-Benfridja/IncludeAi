@@ -101,4 +101,4 @@ Every core interaction — task breakdown granularity, the "starting is hardest"
 
 ## Team
 
-_Add your name(s) / chapter info here._
+Elias
